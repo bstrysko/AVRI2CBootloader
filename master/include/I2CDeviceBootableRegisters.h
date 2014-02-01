@@ -52,7 +52,11 @@
 #define I2C_DEVICE_BOOTABLE_REGISTER_PROGRAM_PAGE_NUMBER 0x4
 
 /*
- * This PAGE_SIZE byte register is W.
+ * This register is R/W.
+ * size PAGESIZE on W / size 1 on R.
+ * Read:
+ *  [7:0] - 1 if last write to this register was successfully written
+    to flash, 0 otherwise
  * Write:
     Bytes [PAGE_SIZE-1:0] - data to be written to current
     page as pointed to by the register PROGRAM_PAGE_NUMBER
