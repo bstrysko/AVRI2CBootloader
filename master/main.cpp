@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include <IntelHexParser/IntelHexFile.h>
 #include <IntelHexParser/Program.h>
 
 #include <I2CDeviceBootable.h>
@@ -24,11 +25,29 @@ int main(int argc, char* argv[])
 	uint8_t i2cBusNumber = stringToUInt8(argv[2]);
 	uint8_t i2cDeviceAddress = stringToUInt8(argv[3]);
 
-	I2CBus bus(1);
-	I2CDeviceBootable d(&bus, 0x40);
+	IntelHexFile file(filename);
+	Program program = file.getProgram();
 
-//	cout << "In BootLoader Mode: " << d.inBootLoaderMode() << endl;
-//	cout << "In Application Mode: " << d.inApplicationMode() << endl;
+	I2CBus bus(i2cBusNumber);
+	I2CDeviceBootable device(&bus, i2cDeviceAddress);
+
+	cout << "BootLoader Version #: " << device.getVersionNumber() << endl;
+	cout << "Page Size: " << (size_t)device.getPageSize() << endl;
+
+	if(!device.inBootLoaderMode())
+	{
+		cout << "Device NOT in bootloader mode" << endl;
+		cout << "Switching to bootloader mode..." << endl;
+		device.enterBootLoaderMode();
+	}
+	else
+	{
+		cout << "Device in bootloader mode..." << endl;
+	}
+
+	cout << "Attempting to flash program..." << endl;
+    device.flash(program);
+	cout << "FLASH SUCCESSFULL" << endl;
 
 	return 0;
 }

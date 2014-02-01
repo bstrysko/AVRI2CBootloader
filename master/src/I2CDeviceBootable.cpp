@@ -152,3 +152,9 @@ uint8_t I2CDeviceBootable::getPageSize()
 {
 	return getRegisterPageSize();
 }
+
+void I2CDeviceBootable::flash(const Program& program)
+{
+	throw ios_base::failure("UNIMPLEMENTED");
+}
+
