@@ -4,16 +4,17 @@ MCU=atmega328p
 PROG=avrispMKII
 
 F_CPU=1000000
-FLAGS=-mmcu=$(MCU) -DF_CPU=$(F_CPU)UL -Os -Wall
+
+FLAGS=-mmcu=$(MCU) -DF_CPU=$(F_CPU)UL -Os -Wall -Wl,-section-start=.data=0x800120
 
 LFUSE=
 HFUSE=
 EFUSE=
 
-SRC=main.c
+SRC= I2CSlave/I2CSlave.c main.c
 HDR=
 
-default: avr.hex
+all: avr.hex Makefile
 
 %.hex: %.elf
 	avr-objcopy -j .text -j .data -O ihex $< $@
