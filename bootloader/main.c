@@ -26,6 +26,8 @@ typedef struct {
 
 bool programApplication(uint8_t* buffer, size_t bufferSize);
 
+#include <util/delay.h>
+
 int main()
 {
   MCUCR = (1 << IVCE);
@@ -37,7 +39,21 @@ int main()
 
   i2CSlaveInit(0x40, onReadFunction, onWriteFunction, I2C_BUFFER_LENGTH);
 
-  while(1);
+  while(1)
+  {
+    DDRC &= ~((1 << 2));
+    _delay_ms(100);
+    _delay_ms(100);
+    _delay_ms(100);
+    _delay_ms(100);
+    _delay_ms(100);
+    DDRC |= (1 << 2);
+    _delay_ms(100);
+    _delay_ms(100);
+    _delay_ms(100);
+    _delay_ms(100);
+    _delay_ms(100); 
+  }
 
   return 0;
 }
@@ -80,7 +96,7 @@ void onWriteFunction(uint8_t reg, uint8_t* buffer, size_t bufferSize)
 	    MCUCR = 0;
 	    sei();
 
-	    asm("jmp 0x0");
+	    asm("jmp 0000");
 
 	    while(1);
 	  }

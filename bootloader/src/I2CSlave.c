@@ -14,8 +14,9 @@ void i2CSlaveInit(uint8_t address, I2CSlaveOnReadFunction onReadFunction, I2CSla
   I2CSlaveDevice.rxBufferIndex = 0;
   I2CSlaveDevice.txBufferIndex = 0;
   I2CSlaveDevice.txBufferLength = 0;
-
-  PORTC |= (1 << 4) | (1 << 5);
+  
+  DDRC = 0;
+  PORTC = (1 << 4) | (1 << 5);
 
   TWAR = (address << 1);
   TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA);

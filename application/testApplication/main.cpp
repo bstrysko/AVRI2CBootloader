@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 	device.writeRegisterA(10);
 	cout << "RegisterA: " << (size_t)device.getRegisterA() << endl;
 	cout << "RegisterB: " << (size_t)device.getRegisterB() << endl;
-	device.writeRegisterB(20);
+	device.writeRegisterB(30);
 	cout << "RegisterA: " << (size_t)device.getRegisterA() << endl;
 	cout << "RegisterB: " << (size_t)device.getRegisterB() << endl;
 
