@@ -3,7 +3,7 @@
 #include <IntelHexParser/IntelHexFile.h>
 #include <IntelHexParser/Program.h>
 
-#include <I2CDeviceBootable.h>
+#include <AVRI2CBootloader/I2CDeviceBootable.h>
 
 #include <sstream>
 #include <algorithm>

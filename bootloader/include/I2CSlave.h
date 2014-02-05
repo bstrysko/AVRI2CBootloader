@@ -8,12 +8,11 @@
 #include <avr/interrupt.h>
 #include <util/twi.h>
 
+#include "../../slaveLib/include/shared.h"
+
 #define AVR_I2C_SLAVE_FREQ 100000L
 
 #define I2CSlaveDevice (*(I2CSlave_t*)0x100) 
-
-typedef size_t (*I2CSlaveOnReadFunction)(uint8_t, uint8_t*);
-typedef void (*I2CSlaveOnWriteFunction)(uint8_t, uint8_t*, size_t);
 
 typedef struct {
   I2CSlaveOnReadFunction onReadFunction;

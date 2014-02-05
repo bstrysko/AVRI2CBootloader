@@ -1,15 +1,12 @@
 LINK_TARGET = i2cAVRFlash
 
 OBJS =  \
-	main.o \
-	src/I2CDeviceBootable.o
-
-DEPFILES = $(patsubst %.o,%.dep,$(OBJS))
+	main.o
 
 CFLAGS = -Iinclude/ -I/usr/include/
-LIBS = -l I2CMaster -l IntelHexParser
+LIBS = -l I2CMaster -l IntelHexParser -l AVRI2CBootloader
 
-REBUILDABLES = $(OBJS) $(LINK_TARGET) $(DEPFILES)
+REBUILDABLES = $(OBJS) $(LINK_TARGET)
 
 all : $(LINK_TARGET)
 	@echo "Build complete"
@@ -24,7 +21,5 @@ $(LINK_TARGET) : $(OBJS)
 %.o : %.cpp
 	g++ $(CFLAGS) -g -o $@ -c $< $(LIBS)
 
-%.dep : %.cpp
-	g++ -M $(CFLAGS) $< > $@ $(LIBS)
-
-include $(OBJS:.o=.dep)
+install:
+	cp $(LINK_TARGET) /usr/bin/

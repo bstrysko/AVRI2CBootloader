@@ -3,8 +3,9 @@
 #include <avr/io.h>
 #include <avr/boot.h>
 
-#include "I2CSlave/I2CSlave.h"
-#include "../master/include/I2CDeviceBootableRegisters.h"
+#include <I2CSlave.h>
+#include "../masterLib/include/I2CDeviceBootableRegisters.h"
+#include "../slaveLib/include/shared.h"
 
 #define I2C_BUFFER_LENGTH (SPM_PAGESIZE+1)
 
@@ -19,6 +20,9 @@ typedef struct {
 
 #define AVRStatus (*(AVRStatus_t*)0x120) 
 #define AVRI2CBOOTLOADER_VERSION 0x01
+
+#define IN_BOOT_LOADER() (AVRStatus.mode == I2C_DEVICE_BOOTABLE_STATUS_BOOT_LOADER)
+#define IN_APPLICATION() (AVRStatus.mode == I2C_DEVICE_BOOTABLE_STATUS_APPLICATION)
 
 bool programApplication(uint8_t* buffer, size_t bufferSize);
 
@@ -105,6 +109,13 @@ void onWriteFunction(uint8_t reg, uint8_t* buffer, size_t bufferSize)
 
       break;
     }
+    default:
+    {
+      if(IN_APPLICATION() && (I2CCallbacks.onWriteFunction != NULL))
+      {
+	I2CCallbacks.onWriteFunction(reg, buffer, bufferSize);
+      }
+    }
   }
 }
 
@@ -142,10 +153,17 @@ size_t onReadFunction(uint8_t reg, uint8_t* buffer)
     {
       buffer[0] = AVRStatus.lastWriteSuccess;
       return 1; 
-    } 
+    }
     default:
     {
-      return 0;
+      if(IN_APPLICATION() && (I2CCallbacks.onReadFunction != NULL))
+      {
+	return I2CCallbacks.onReadFunction(reg, buffer);
+      }
+      else
+      {
+	return 0;
+      }
     }
   }
 }

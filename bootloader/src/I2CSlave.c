@@ -1,4 +1,4 @@
-#include "I2CSlave.h"
+#include <I2CSlave.h>
 
 void i2cSlaveReply(uint8_t ack);
 void i2cSlaveStop();

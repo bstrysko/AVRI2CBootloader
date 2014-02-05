@@ -5,9 +5,13 @@
 
 # Compiled Dynamic libraries
 *.so
+*.so.*
 *.dylib
 
 # Compiled Static libraries
 *.lai
 *.la
 *.a
+
+*.elf
+*.hex
