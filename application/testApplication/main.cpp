@@ -38,15 +38,12 @@ int main(int argc, char* argv[])
 		cout << "Device in application mode..." << endl;
 	}
 
-	cout << "RegisterA: " << (size_t)device.getRegisterA() << endl;
-	cout << "RegisterB: " << (size_t)device.getRegisterB() << endl;
 	device.writeRegisterA(10);
-	cout << "RegisterA: " << (size_t)device.getRegisterA() << endl;
-	cout << "RegisterB: " << (size_t)device.getRegisterB() << endl;
 	device.writeRegisterB(30);
-	cout << "RegisterA: " << (size_t)device.getRegisterA() << endl;
-	cout << "RegisterB: " << (size_t)device.getRegisterB() << endl;
 
+	cout << "Register A: " << (size_t)device.getRegisterA() << endl;
+	cout << "Register B: " << (size_t)device.getRegisterB() << endl;
+	
 	return 0;
 }
 

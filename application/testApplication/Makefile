@@ -1,4 +1,4 @@
-LINK_TARGET = test
+LINK_TARGET = testp
 
 OBJS =  \
 	main.o \
@@ -21,3 +21,6 @@ $(LINK_TARGET) : $(OBJS)
 
 %.o : %.cpp
 	g++ $(CFLAGS) -g -o $@ -c $< $(LIBS)
+
+test:
+	sudo ./testp 1 64

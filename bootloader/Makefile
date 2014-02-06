@@ -6,7 +6,7 @@ PROG=avrispMKII
 
 F_CPU=8000000
 
-FLAGS=-I./include/ -mmcu=$(MCU) -DF_CPU=$(F_CPU)UL -Os -Wall -Wl,--section-start=.text=$(BOOTSTART) -Wl,--section-start=.data=0x800140
+FLAGS=-I./include/ -mmcu=$(MCU) -DF_CPU=$(F_CPU)UL -Os -Wall -Wl,--section-start=.text=$(BOOTSTART) -Wl,--section-start=.data=0x800144
 
 LFUSE=0xE2
 HFUSE=0xD8

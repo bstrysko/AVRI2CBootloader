@@ -3,6 +3,8 @@
 
 #include <AVRI2CBootloader/I2CDeviceBootable.h>
 
+#include "TestDeviceRegisters.h"
+
 class TestDevice : public I2CDeviceBootable
 {
   public:
@@ -10,7 +12,7 @@ class TestDevice : public I2CDeviceBootable
 
     uint8_t getRegisterA();
     uint8_t getRegisterB();
-
+  
     void writeRegisterA(uint8_t v);
     void writeRegisterB(uint8_t v);
 };

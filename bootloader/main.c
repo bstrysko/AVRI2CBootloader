@@ -26,8 +26,6 @@ typedef struct {
 
 bool programApplication(uint8_t* buffer, size_t bufferSize);
 
-#include <util/delay.h>
-
 int main()
 {
   MCUCR = (1 << IVCE);
@@ -37,23 +35,12 @@ int main()
   AVRStatus.pageNumber = 0;
   AVRStatus.lastWriteSuccess = false;
 
+  I2CCallbacks.onReadFunction = NULL;
+  I2CCallbacks.onWriteFunction = NULL;
+
   i2CSlaveInit(0x40, onReadFunction, onWriteFunction, I2C_BUFFER_LENGTH);
 
-  while(1)
-  {
-    DDRC &= ~((1 << 2));
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-    DDRC |= (1 << 2);
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100); 
-  }
+  while(1);
 
   return 0;
 }
@@ -68,7 +55,7 @@ void onWriteFunction(uint8_t reg, uint8_t* buffer, size_t bufferSize)
       {
 	case I2C_DEVICE_BOOTABLE_STATUS_BOOT_LOADER:
 	{
-	  if(AVRStatus.mode == I2C_DEVICE_BOOTABLE_STATUS_APPLICATION)
+	  if(IN_APPLICATION())
 	  {
 	    AVRStatus.mode = I2C_DEVICE_BOOTABLE_STATUS_BOOT_LOADER;
 
@@ -85,7 +72,7 @@ void onWriteFunction(uint8_t reg, uint8_t* buffer, size_t bufferSize)
 	}
 	case I2C_DEVICE_BOOTABLE_STATUS_APPLICATION:
 	{
-	  if(AVRStatus.mode == I2C_DEVICE_BOOTABLE_STATUS_BOOT_LOADER)
+	  if(IN_BOOT_LOADER())
 	  {
 	    AVRStatus.mode = I2C_DEVICE_BOOTABLE_STATUS_APPLICATION;
   
@@ -103,6 +90,10 @@ void onWriteFunction(uint8_t reg, uint8_t* buffer, size_t bufferSize)
 
 	  break;
 	}
+	default:
+	{
+	  break;
+	}
       }
       
       break;
@@ -114,7 +105,7 @@ void onWriteFunction(uint8_t reg, uint8_t* buffer, size_t bufferSize)
     }
     case I2C_DEVICE_BOOTABLE_REGISTER_PROGRAM_PAGE_DATA:
     {
-      if(AVRStatus.mode == I2C_DEVICE_BOOTABLE_STATUS_BOOT_LOADER)
+      if(IN_BOOT_LOADER())
       {
 	AVRStatus.lastWriteSuccess = programApplication(buffer, bufferSize);
       }
@@ -131,6 +122,8 @@ void onWriteFunction(uint8_t reg, uint8_t* buffer, size_t bufferSize)
       {
 	I2CCallbacks.onWriteFunction(reg, buffer, bufferSize);
       }
+    
+      break;
     }
   }
 }
@@ -177,7 +170,7 @@ size_t onReadFunction(uint8_t reg, uint8_t* buffer)
 	return I2CCallbacks.onReadFunction(reg, buffer);
       }
       else
-      {
+      { 
 	return 0;
       }
     }

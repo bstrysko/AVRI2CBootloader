@@ -1,45 +1,26 @@
 #include <AVRI2CBootloader/avr/application.h>
 
+#include "./testApplication/include/TestDeviceRegisters.h"
+
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <util/delay.h>
 
 size_t onI2CRead(uint8_t reg, uint8_t* buffer);
 void onI2CWrite(uint8_t reg, uint8_t* buffer, size_t bufferSize);
 
-#define a (*(uint8_t*)0x140)
-#define b (*(uint8_t*)0x172)
+#define a (*(volatile uint8_t*)0x140)
 
 int main()
 {
-  a = 10;
-  b = 20;
+  a = 0;
 
   I2CCallbacks.onReadFunction = onI2CRead;
   I2CCallbacks.onWriteFunction = onI2CWrite;
 
-  DDRC |= (1 << 1);
   sei();
 
-  while(1)
-  {
-    DDRC &= ~((1 << 0));
-
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-
-    DDRC |= (1 << 0);
-
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-    _delay_ms(100);
-  }
+  while(1);
 
   return 0;
 }
@@ -48,25 +29,15 @@ size_t onI2CRead(uint8_t reg, uint8_t* buffer)
 {
   switch(reg)
   {
-    case 0x20:
+    case REGISTER_A:
     {
       buffer[0] = a;
       return 1;
-      break;
     }
-/*
-    case 0x20:
+    case REGISTER_B:
     {
-      buffer[0] = b;
+      buffer[0] = 111;
       return 1;
-      break;
-    }
-*/
-    default:
-    {
-      buffer[0] = 123;
-      return 1;
-      break;
     }
   }
 
@@ -77,17 +48,15 @@ void onI2CWrite(uint8_t reg, uint8_t* buffer, size_t bufferSize)
 {
   switch(reg)
   {
-    case 0x20:
+    case REGISTER_A:
     {
       a = buffer[0];
-      return;
       break;
-    }
-    case 0x21:
+    } 
+    case REGISTER_B:
     {
-      b = buffer[0];
-      return;
+      a = buffer[0] + 5;
       break;
-    }
+    } 
   }
 }

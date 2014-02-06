@@ -83,11 +83,15 @@ SIGNAL(TWI_vect)
     {
        // sends ack and stops interface for clock stretching
       i2cSlaveStop();
-      I2CSlaveDevice.onWriteFunction(
-	I2CSlaveDevice.rxBuffer[0],
-	I2CSlaveDevice.rxBuffer+1,
-	I2CSlaveDevice.rxBufferIndex-1
-      );
+
+      if(I2CSlaveDevice.rxBufferIndex > 1)
+      {
+	I2CSlaveDevice.onWriteFunction(
+	  I2CSlaveDevice.rxBuffer[0],
+	  I2CSlaveDevice.rxBuffer+1,
+	  I2CSlaveDevice.rxBufferIndex-1
+	);
+      }
 
       i2cPostOnWrite(); 
       break;
