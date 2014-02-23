@@ -2,6 +2,7 @@
 
 #include <I2CDeviceBootable.h>
 #include <I2CDeviceBootLoader.h>
+#include <ApplicationProgram.h>
 
 #include <sstream>
 #include <algorithm>
@@ -23,12 +24,12 @@ int main(int argc, char* argv[])
 	uint8_t i2cDeviceAddress = stringToUInt8(argv[2]);
 	string filename(argv[3]);
 
-	cout << (int)i2cBusNumber << endl;
-	cout << (int)i2cDeviceAddress << endl;
-	cout << filename << endl;
-
+	ApplicationProgram program(filename);
+	program.loadPages(260);
+	
 	I2CBus bus(1);
 	I2CDeviceBootLoader d(&bus, 0x40);
+
 
 	cout << "In BootLoader Mode: " << d.inBootLoaderMode() << endl;
 	cout << "In Application Mode: " << d.inApplicationMode() << endl;
