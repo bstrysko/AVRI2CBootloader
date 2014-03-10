@@ -94,3 +94,61 @@ void I2CDeviceBootable::enterApplicationMode()
 		);
 	}
 }
+
+/*
+    uint8_t getRegisterBootVersion();
+    uint8_t getRegisterPageSize();
+    uint16_t getRegisterPageNumber();
+
+    void writeBootStatus(uint8_t status);
+    void writePageNumber(uint16_t pageNumber);
+    void writePageData(vector<uint8_t> pageData);
+  public:
+    bool inBootLoaderMode();
+    bool inApplicationMode();
+
+    float getVersionNumber();
+    uint8_t getPageSize();
+
+    void enterBootLoaderMode();
+    void enterApplicationMode();
+
+    void flash(Program* program);
+*/
+uint8_t I2CDeviceBootable::getRegisterBootVersion()
+{
+	uint8_t version;
+	i2cRead(
+		I2C_DEVICE_BOOTABLE_REGISTER_VERSION,
+		&version, 1
+	);
+	return version;
+}
+
+uint8_t I2CDeviceBootable::getRegisterPageSize()
+{
+	uint8_t pageSize;
+	i2cRead(
+		I2C_DEVICE_BOOTABLE_REGISTER_PAGE_SIZE,
+		&pageSize, 1
+	);
+	return pageSize;
+}
+
+float I2CDeviceBootable::getVersionNumber()
+{
+	uint8_t status = getRegisterBootVersion();
+
+	uint8_t hStatus = (status >> 4) & 0xF;
+	uint8_t lStatus = status & 0xF;	
+
+	float version = hStatus;
+	version += (0.1 * lStatus);
+
+	return version;
+}
+
+uint8_t I2CDeviceBootable::getPageSize()
+{
+	return getRegisterPageSize();
+}

@@ -2,15 +2,12 @@ LINK_TARGET = i2cAVRFlash
 
 OBJS =  \
 	main.o \
-	src/I2CDeviceBootable.o \
-	src/I2CDeviceBootLoader.o \
-	src/ApplicationPage.o \
-	src/ApplicationProgram.o
+	src/I2CDeviceBootable.o
 
 DEPFILES = $(patsubst %.o,%.dep,$(OBJS))
 
-CFLAGS = -Iinclude/
-LIBS = -l I2CMaster
+CFLAGS = -Iinclude/ -I/usr/include/
+LIBS = -l I2CMaster -l IntelHexParser
 
 REBUILDABLES = $(OBJS) $(LINK_TARGET) $(DEPFILES)
 
