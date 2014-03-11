@@ -6,8 +6,7 @@
 #include "I2CSlave/I2CSlave.h"
 #include "../master/include/I2CDeviceBootableRegisters.h"
 
-#define I2C_BUFFER_LENGTH 10 
-//SPM_PAGESIZE
+#define I2C_BUFFER_LENGTH (SPM_PAGESIZE+1)
 
 void onWriteFunction(uint8_t reg, uint8_t* buffer, size_t bufferSize);
 size_t onReadFunction(uint8_t reg, uint8_t* buffer);
@@ -21,7 +20,7 @@ typedef struct {
 #define AVRStatus (*(AVRStatus_t*)0x120) 
 #define AVRI2CBOOTLOADER_VERSION 0x01
 
-void programApplication(uint8_t* buffer, size_t bufferSize);
+bool programApplication(uint8_t* buffer, size_t bufferSize);
 
 int main()
 {
@@ -53,21 +52,36 @@ void onWriteFunction(uint8_t reg, uint8_t* buffer, size_t bufferSize)
 	  {
 	    AVRStatus.mode = I2C_DEVICE_BOOTABLE_STATUS_BOOT_LOADER;
 
+	    sei();
+	    i2cPostOnWrite();
+
 	    //TODO: use Makefile variable
-	    asm("jmp 6144");
+	    asm("jmp 28762");
+
+	    while(1);
 	  }
+
+	  break;
 	}
 	case I2C_DEVICE_BOOTABLE_STATUS_APPLICATION:
 	{
 	  if(AVRStatus.mode == I2C_DEVICE_BOOTABLE_STATUS_BOOT_LOADER)
 	  {
 	    AVRStatus.mode = I2C_DEVICE_BOOTABLE_STATUS_APPLICATION;
+  
+	    sei();
+	    i2cPostOnWrite();
 
 	    MCUCR = (1 << IVCE);
 	    MCUCR = 0;
+	    sei();
 
-	    asm("jmp 0000");
+	    asm("jmp 0x0");
+
+	    while(1);
 	  }
+
+	  break;
 	}
       }
       
@@ -82,8 +96,7 @@ void onWriteFunction(uint8_t reg, uint8_t* buffer, size_t bufferSize)
     {
       if(AVRStatus.mode == I2C_DEVICE_BOOTABLE_STATUS_BOOT_LOADER)
       {
-	programApplication(buffer, bufferSize);
-	AVRStatus.lastWriteSuccess = true;
+	AVRStatus.lastWriteSuccess = programApplication(buffer, bufferSize);
       }
       else
       {
@@ -135,13 +148,11 @@ size_t onReadFunction(uint8_t reg, uint8_t* buffer)
       return 0;
     }
   }
-
-  return 0;
 }
 
-void programApplication(uint8_t* buffer, size_t bufferSize)
+bool programApplication(uint8_t* buffer, size_t bufferSize)
 {
-  uint32_t page = AVRStatus.pageNumber;
+  uint32_t page = AVRStatus.pageNumber * SPM_PAGESIZE;
 
   cli();  
   eeprom_busy_wait();
@@ -162,5 +173,7 @@ void programApplication(uint8_t* buffer, size_t bufferSize)
   boot_rww_enable ();
 
   sei();
+
+  return (bufferSize == SPM_PAGESIZE);
 }
 

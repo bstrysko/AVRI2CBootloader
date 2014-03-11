@@ -40,6 +40,12 @@ void i2cSlaveStop()
   }
 }
 
+void i2cPostOnWrite()
+{
+  I2CSlaveDevice.rxBufferIndex = 0;
+  TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA) | (1 << TWINT);
+}
+
 SIGNAL(TWI_vect)
 {
   switch(TW_STATUS)
@@ -81,9 +87,8 @@ SIGNAL(TWI_vect)
 	I2CSlaveDevice.rxBuffer+1,
 	I2CSlaveDevice.rxBufferIndex-1
       );
-      
-      I2CSlaveDevice.rxBufferIndex = 0;
-      TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA) | (1 << TWINT);
+
+      i2cPostOnWrite(); 
       break;
     }
     case TW_SR_DATA_NACK:       // data received, returned nack

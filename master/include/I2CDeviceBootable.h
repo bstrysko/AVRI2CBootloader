@@ -16,6 +16,7 @@ class I2CDeviceBootable : public I2CDevice
     uint8_t getRegisterBootVersion();
     uint8_t getRegisterPageSize();
     uint16_t getRegisterPageNumber();
+    uint8_t getRegisterPageData();
 
     void writeBootStatus(uint8_t status);
     void writePageNumber(uint16_t pageNumber);
@@ -32,7 +33,7 @@ class I2CDeviceBootable : public I2CDevice
     void enterBootLoaderMode();
     void enterApplicationMode();
 
-    void flash(const Program& program);
+    void flash(Program program);
 };
 
 #endif

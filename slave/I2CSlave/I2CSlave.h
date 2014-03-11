@@ -35,4 +35,6 @@ void i2CSlaveInit
   size_t bufferLength
 );
 
+void i2cPostOnWrite();
+
 #endif

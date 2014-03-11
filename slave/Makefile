@@ -1,5 +1,4 @@
 BOOTSTART=0x7000
-#0x3800
 PART=m328p
 MCU=atmega328p
 
@@ -32,3 +31,6 @@ fuse:
 
 clean:
 	rm avr.hex avr.elf
+
+disasm:
+	avr-objdump -s -m avr5 -D avr.hex

@@ -49,6 +49,14 @@ int main(int argc, char* argv[])
     device.flash(program);
 	cout << "FLASH SUCCESSFULL" << endl;
 
+
+	cout << "Testing new application..." << endl;
+	device.enterApplicationMode();
+	cout << "Switching back to bootloader..." << endl;
+	device.enterBootLoaderMode();
+
+	cout << "SUCCESS" << endl;
+
 	return 0;
 }
 

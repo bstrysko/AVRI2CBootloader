@@ -34,15 +34,70 @@ uint8_t I2CDeviceBootable::getRegisterBootStatus()
 	return status;
 }
 
+uint8_t I2CDeviceBootable::getRegisterBootVersion()
+{
+	uint8_t version;
+	i2cRead(
+		I2C_DEVICE_BOOTABLE_REGISTER_VERSION,
+		&version, 1
+	);
+	return version;
+}
+
+uint8_t I2CDeviceBootable::getRegisterPageSize()
+{
+	uint8_t pageSize;
+	i2cRead(
+		I2C_DEVICE_BOOTABLE_REGISTER_PAGE_SIZE,
+		&pageSize, 1
+	);
+	return pageSize;
+}
+
+uint16_t I2CDeviceBootable::getRegisterPageNumber()
+{
+	uint16_t pageNumber;
+	i2cRead(
+		I2C_DEVICE_BOOTABLE_REGISTER_PROGRAM_PAGE_NUMBER,
+		(uint8_t*)&pageNumber, 2
+	);
+	return pageNumber;
+}
+
+uint8_t I2CDeviceBootable::getRegisterPageData()
+{
+	uint8_t pageData;
+	i2cRead(
+		I2C_DEVICE_BOOTABLE_REGISTER_PROGRAM_PAGE_DATA,
+		(uint8_t*)&pageData, 1
+	);
+	return pageData;
+}
+
 void I2CDeviceBootable::writeBootStatus(uint8_t status)
 {
 	i2cWrite(
 		I2C_DEVICE_BOOTABLE_REGISTER_BOOT_STATUS,
 		&status, 1
 	);
-	
 }
  
+void I2CDeviceBootable::writePageNumber(uint16_t pageNumber)
+{
+	i2cWrite(
+		I2C_DEVICE_BOOTABLE_REGISTER_PROGRAM_PAGE_NUMBER,
+		(uint8_t*)&pageNumber, 2
+	);
+}
+
+void I2CDeviceBootable::writePageData(vector<uint8_t> pageData)
+{
+	i2cWrite(
+		I2C_DEVICE_BOOTABLE_REGISTER_PROGRAM_PAGE_DATA,
+		pageData.data(), pageData.size()
+	);
+}
+
 bool I2CDeviceBootable::inBootLoaderMode()
 {
 	checkRegisterMagic();
@@ -95,46 +150,6 @@ void I2CDeviceBootable::enterApplicationMode()
 	}
 }
 
-/*
-    uint8_t getRegisterBootVersion();
-    uint8_t getRegisterPageSize();
-    uint16_t getRegisterPageNumber();
-
-    void writeBootStatus(uint8_t status);
-    void writePageNumber(uint16_t pageNumber);
-    void writePageData(vector<uint8_t> pageData);
-  public:
-    bool inBootLoaderMode();
-    bool inApplicationMode();
-
-    float getVersionNumber();
-    uint8_t getPageSize();
-
-    void enterBootLoaderMode();
-    void enterApplicationMode();
-
-    void flash(Program* program);
-*/
-uint8_t I2CDeviceBootable::getRegisterBootVersion()
-{
-	uint8_t version;
-	i2cRead(
-		I2C_DEVICE_BOOTABLE_REGISTER_VERSION,
-		&version, 1
-	);
-	return version;
-}
-
-uint8_t I2CDeviceBootable::getRegisterPageSize()
-{
-	uint8_t pageSize;
-	i2cRead(
-		I2C_DEVICE_BOOTABLE_REGISTER_PAGE_SIZE,
-		&pageSize, 1
-	);
-	return pageSize;
-}
-
 float I2CDeviceBootable::getVersionNumber()
 {
 	uint8_t status = getRegisterBootVersion();
@@ -153,8 +168,38 @@ uint8_t I2CDeviceBootable::getPageSize()
 	return getRegisterPageSize();
 }
 
-void I2CDeviceBootable::flash(const Program& program)
+void I2CDeviceBootable::flash(Program program)
 {
-	throw ios_base::failure("UNIMPLEMENTED");
+	uint8_t pageSize = getPageSize();
+	vector<ProgramPage> pages = program.getPages(pageSize);
+
+	for(size_t i = 0; i < pages.size(); i++)
+	{
+		ProgramPage page = pages[i];
+
+		writePageNumber((uint16_t)i);
+
+		size_t r = getRegisterPageNumber();
+		if(r != i)
+		{
+			stringstream o;
+			o << "Page Number " << r;
+			o << " expecting " << i;
+			throw ios_base::failure(o.str());
+		}
+
+		vector<uint8_t> pageData = page.getData();
+		pageData.resize(pageSize, 0xFF);
+		writePageData(pageData);
+
+		r = getRegisterPageData();
+		if(!r)
+		{
+			stringstream o;
+			o << "Page write failed, Result: ";
+			o << r;
+			throw ios_base::failure(o.str());
+		}
+	}
 }
 
