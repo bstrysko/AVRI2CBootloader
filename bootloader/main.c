@@ -38,7 +38,7 @@ int main()
   I2CCallbacks.onReadFunction = NULL;
   I2CCallbacks.onWriteFunction = NULL;
 
-  i2CSlaveInit(0x40, onReadFunction, onWriteFunction, I2C_BUFFER_LENGTH);
+  i2CSlaveInit(64, onReadFunction, onWriteFunction, I2C_BUFFER_LENGTH);
 
   while(1);
 
@@ -155,7 +155,7 @@ size_t onReadFunction(uint8_t reg, uint8_t* buffer)
     case I2C_DEVICE_BOOTABLE_REGISTER_PROGRAM_PAGE_NUMBER:
     {
       buffer[0] = (AVRStatus.pageNumber & 0xFF);
-      buffer[1] = ((AVRStatus.pageNumber >> 4) & 0xFF);
+      buffer[1] = ((AVRStatus.pageNumber >> 8) & 0xFF);
       return 2;
     }
     case I2C_DEVICE_BOOTABLE_REGISTER_PROGRAM_PAGE_DATA:
